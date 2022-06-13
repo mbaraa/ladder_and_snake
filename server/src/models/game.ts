@@ -1,0 +1,39 @@
+import * as seq from "sequelize";
+import db from "../db";
+
+const Game = db.define("game", {
+  id: {
+    type: seq.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+
+  player_id: {
+    type: seq.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+  },
+
+  player_1_location: {
+    type: seq.INTEGER,
+    allowNull: false,
+  },
+
+  player_2_location: {
+    type: seq.INTEGER,
+    allowNull: false,
+  },
+
+  total_dice_rolls: {
+    type: seq.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  },
+
+  save_date: {
+    type: seq.DATE,
+    allowNull: false,
+    defaultValue: seq.NOW,
+  },
+});
