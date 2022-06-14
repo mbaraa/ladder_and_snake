@@ -148,9 +148,6 @@ const Board = ({ game, update }: Props): React.ReactElement => {
       return;
     }
 
-    const freshGame =
-      game.player_1_location === 1 && game.player_2_location === 1;
-
     cells[
       cells.findIndex(
         (cell) => (cell.currentPlayer & game.current_player) !== 0
@@ -179,9 +176,7 @@ const Board = ({ game, update }: Props): React.ReactElement => {
     if (gameOver) {
       return;
     }
-    if (!freshGame) {
-      game.current_player = game.current_player === 1 ? 2 : 1;
-    }
+    game.current_player = game.current_player === 1 ? 2 : 1;
     update();
   };
 
