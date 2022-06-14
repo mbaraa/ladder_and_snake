@@ -1,5 +1,5 @@
 const config = {
-  backendAddress: "http://localhost:8080",
+  backendAddress: "https://balloons.sheev.xyz",
 };
 
 export default config;
