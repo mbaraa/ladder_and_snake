@@ -15,7 +15,7 @@ class PlayerRequests {
       .then((resp) => resp.json())
       .then((resp) => {
         localStorage.setItem("token", resp.token);
-        return resp.user as Player;
+        return resp.player as Player;
       })
       .catch((err) => {
         console.error(err);
@@ -34,7 +34,7 @@ class PlayerRequests {
     })
       .then((resp) => resp.json())
       .then((resp) => {
-        return resp as Player;
+        return resp.player as Player;
       })
       .catch((err) => {
         console.error(err);
@@ -55,7 +55,7 @@ class PlayerRequests {
       .then((resp) => resp.json())
       .then((resp) => {
         localStorage.setItem("token", resp.token);
-        return resp.user as Player;
+        return resp.player as Player;
       })
       .catch((err) => {
         console.error(err);

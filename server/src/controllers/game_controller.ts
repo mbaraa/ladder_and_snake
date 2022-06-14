@@ -15,8 +15,8 @@ class GameController {
       GameController.instance = new GameController();
       GameController.router = express.Router();
 
-      GameController.router.post("/new/", GameController.instance.newGame);
       GameController.router.post("/save/", GameController.instance.saveGame);
+      GameController.router.get("/new/", GameController.instance.newGame);
       GameController.router.get("/load/", GameController.instance.loadGames);
     }
 
@@ -48,6 +48,7 @@ class GameController {
 
       res.json({
         id: (createdGame as any).id,
+        player_id: (createdGame as any).player_id,
         player_1_location: (createdGame as any).player_1_location,
         player_2_location: (createdGame as any).player_2_location,
         total_dice_rolls: (createdGame as any).total_dice_rolls,
@@ -88,7 +89,7 @@ class GameController {
         }
       );
 
-      res.status(200).send("ok");
+      res.status(200);
       return;
     }
 

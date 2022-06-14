@@ -3,10 +3,8 @@ import Player from "../../models/player";
 import Input from "../Input";
 import PlayerRequests from "../../utils/player_requests";
 import Button from "../Button";
-import { useHistory } from "react-router-dom";
 
 const SignupFragment = (): React.ReactElement => {
-  const router = useHistory();
   const [player, setPlayer] = React.useState<Player>({
     username: "",
     password: "",
@@ -15,7 +13,7 @@ const SignupFragment = (): React.ReactElement => {
 
   const signup = async () => {
     await PlayerRequests.signup(player);
-    router.push("/");
+    window.location.reload();
   };
 
   return (

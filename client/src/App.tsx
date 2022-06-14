@@ -17,7 +17,7 @@ const App = (): React.ReactElement => {
     })();
   }, []);
 
-  if (loading) {
+  if (loading && player !== null) {
     return <>Loading...</>;
   }
 

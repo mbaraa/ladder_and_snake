@@ -65,7 +65,7 @@ class PlayerController {
     const token = jwt.sign(player2, config.jwt_secret);
 
     res.json({
-      user: player2,
+      player: player2,
       token: token,
     });
   }
@@ -104,7 +104,7 @@ class PlayerController {
     const token = jwt.sign(player2, config.jwt_secret);
 
     res.json({
-      user: player2,
+      player: player2,
       token: token,
     });
   }
@@ -127,7 +127,7 @@ class PlayerController {
     })
       .then(() => {
         res.json({
-          user: p,
+          player: p,
           token: jwt.sign(p, config.jwt_secret),
         });
       })

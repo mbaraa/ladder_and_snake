@@ -3,7 +3,7 @@ interface Game {
   player_id: number;
   player_1_location: number;
   player_2_location: number;
-  saved_at: Date;
+  save_date: Date;
 }
 
 export default Game;
