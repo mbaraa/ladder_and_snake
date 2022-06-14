@@ -1,6 +1,5 @@
 import * as React from "react";
 import TopBar from "./TopBar";
-import Footer from "./Footer";
 import Middle from "./Middle";
 import Game from "../../models/game";
 

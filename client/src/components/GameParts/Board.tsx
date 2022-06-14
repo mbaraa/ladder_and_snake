@@ -2,6 +2,8 @@ import * as React from "react";
 import BoardCell from "./BoardCell";
 import Game from "../../models/game";
 import Button from "../Button";
+import { useHistory } from "react-router-dom";
+import GameRequests from "../../utils/game_requests";
 
 interface Props {
   game: Game;
@@ -14,6 +16,10 @@ interface Cell {
 }
 
 const Board = ({ game, update }: Props): React.ReactElement => {
+  const router = useHistory();
+
+  const [gameOver, setGameOver] = React.useState(false);
+
   const [cells, setCells] = React.useState([
     { currentPlayer: 0, cellNumber: 21 },
     { currentPlayer: 0, cellNumber: 22 },
@@ -41,6 +47,19 @@ const Board = ({ game, update }: Props): React.ReactElement => {
     { currentPlayer: 0, cellNumber: 4 },
   ]);
 
+  const newGame = async () => {
+    const _game = await GameRequests.newGame();
+    await (async () => {
+      game.total_dice_rolls = 0;
+      game.player_1_location = 1;
+      game.player_2_location = 1;
+      game.current_player = 1;
+      update();
+      router.push(`/game/${_game?.id}`);
+      window.location.reload();
+    })();
+  };
+
   React.useEffect(() => {
     if (game.player_1_location === 1 && game.player_2_location === 1) {
       cells[cells.findIndex((cell) => cell.cellNumber === 1)].currentPlayer = 3;
@@ -61,7 +80,12 @@ const Board = ({ game, update }: Props): React.ReactElement => {
     update();
   }, []);
 
-  const finishGame = () => {};
+  const finishGame = async () => {
+    await (async () => {
+      router.push("/");
+    })();
+    await GameRequests.deleteGame(game.id);
+  };
 
   const [dice, setDice] = React.useState(0);
 
@@ -89,6 +113,11 @@ const Board = ({ game, update }: Props): React.ReactElement => {
       newCell = moveLadder(newCell);
     }
 
+    if (newCell === 24) {
+      setGameOver(true);
+      return 24;
+    }
+
     if (newCell > 24) {
       return cell;
     }
@@ -100,8 +129,14 @@ const Board = ({ game, update }: Props): React.ReactElement => {
     if (game.player_1_location === game.player_2_location) {
       if (game.player_1_location % 2 !== 0) {
         game.player_1_location -= Math.min(5, game.player_1_location);
+        if (game.player_1_location === 0) {
+          game.player_1_location++;
+        }
       } else {
         game.player_2_location -= Math.min(5, game.player_2_location);
+        if (game.player_2_location === 0) {
+          game.player_2_location++;
+        }
       }
     }
   };
@@ -138,14 +173,38 @@ const Board = ({ game, update }: Props): React.ReactElement => {
     setCells(cells.flat());
 
     game.total_dice_rolls++;
+
     if (!freshGame) {
       game.current_player = game.current_player === 1 ? 2 : 1;
+    }
+    if (gameOver) {
+      return;
     }
     update();
   };
 
   return (
     <>
+      {gameOver && (
+        <div
+          className="z-[50] bg-black bg-opacity-50 w-[100vw] h-[100vh] absolute top-0 left-0"
+          onClick={finishGame}
+        >
+          <div className="absolute top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%] text-black bg-white w-[500px] h-[500px] border-2 border-black">
+            <h1 className="text-[50px] text-center w-[100%]">Great</h1>
+            <h1 className="text-[50px] text-center w-[100%]">
+              <label className="text-[#d9cc2a]">
+                Player {game.current_player}
+              </label>{" "}
+              Won
+            </h1>
+            <img src="/stars.png" className="w-[500px]" />
+            <Button title="New Game" onClick={newGame} className="mb-[10px]" />
+            <Button title="Back Home" onClick={finishGame} />
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-4 w-[400px]">
         {cells.map((cell) => (
           <BoardCell
