@@ -176,7 +176,7 @@ const Board = ({ game, update }: Props): React.ReactElement => {
     if (gameOver) {
       return;
     }
-    
+    game.current_player = game.current_player === 1 ? 2 : 1;
     update();
   };
 
