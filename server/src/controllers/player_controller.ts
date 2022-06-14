@@ -19,6 +19,10 @@ class PlayerController {
       PlayerController.router = express.Router();
 
       PlayerController.router.post("/login/", PlayerController.instance.login);
+      PlayerController.router.get(
+        "/token-login/",
+        PlayerController.instance.tokenLogin
+      );
       PlayerController.router.post(
         "/signup/",
         PlayerController.instance.signup
@@ -30,26 +34,54 @@ class PlayerController {
 
   public async login(req: express.Request, res: express.Response) {
     const player0 = req.body;
-    const _token = req.get("Authorization") as string;
 
     let player: any;
     let match = false;
 
+    if (player0.username === undefined) {
+      res.status(400).send("bad request");
+      return;
+    }
+    player = (
+      await Player.findOne({
+        where: {
+          username: player0.username,
+        },
+      })
+    )?.get();
+
+    match = await bcrypt.compare(player0.password, player?.password ?? "");
+
+    if (player === null || player === undefined || !match) {
+      res.status(401).send("unauthorized");
+      return;
+    }
+
+    const player2 = {
+      username: player.username,
+      full_name: player.full_name,
+    };
+
+    const token = jwt.sign(player2, config.jwt_secret);
+
+    res.json({
+      user: player2,
+      token: token,
+    });
+  }
+
+  public async tokenLogin(req: express.Request, res: express.Response) {
+    const _token = req.get("Authorization") as string;
+
     try {
       jwt.verify(_token, config.jwt_secret);
     } catch {
-      player = (
-        await Player.findOne({
-          where: {
-            username: player0.username,
-          },
-        })
-      )?.get();
-
-      match = await bcrypt.compare(player0.password, player?.password ?? "");
+      res.status(400);
+      return;
     }
 
-    if (_token !== undefined && _token.length !== 0 && !match) {
+    let player: any;
+    if (_token !== undefined && _token.length !== 0) {
       player = (
         await Player.findOne({
           where: {
@@ -59,8 +91,8 @@ class PlayerController {
       )?.get();
     }
 
-    if (player === null || player === undefined || !match) {
-      res.status(400).send("unauthorized");
+    if (player === null || player === undefined) {
+      res.status(401).send("unauthorized");
       return;
     }
 

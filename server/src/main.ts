@@ -6,7 +6,7 @@ import PlayerController from "./controllers/player_controller";
 import GameController from "./controllers/game_controller";
 
 const app = express();
-app.use(cors()).use(express.json());
+app.use(cors()).use(express.json()).use(express.text());
 
 app.use("/player", PlayerController.getRouter());
 app.use("/game", GameController.getRouter());
