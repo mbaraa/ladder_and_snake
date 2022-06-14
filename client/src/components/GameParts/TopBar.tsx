@@ -18,8 +18,10 @@ const TopBar = ({ game, update }: Props): React.ReactElement => {
       game.total_dice_rolls = 0;
       game.player_1_location = 1;
       game.player_2_location = 1;
+      game.current_player = 1;
       update();
       router.push(`/game/${_game?.id}`);
+      window.location.reload();
     })();
   };
 
