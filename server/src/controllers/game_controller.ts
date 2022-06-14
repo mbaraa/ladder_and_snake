@@ -32,143 +32,121 @@ class GameController {
   }
 
   public async newGame(req: express.Request, res: express.Response) {
-    const token = req.get("Authorization") as string;
+    const player = await (GameController.instance as GameController).#getPlayer(
+      req,
+      res
+    );
 
-    try {
-      jwt.verify(token, config.jwt_secret);
-    } catch {
-      res.status(400).send("invalid token");
+    if (player === null) {
+      res.status(500).end();
       return;
     }
 
-    if (token.length !== 0) {
-      const fetchedPlayer = (
-        await Player.findOne({
-          where: {
-            username: jwt.decode(token, { json: true })?.username,
-          },
-        })
-      )?.get();
+    const createdGame = await Game.create({
+      player_id: player.id,
+    });
 
-      const createdGame = await Game.create({
-        player_id: fetchedPlayer.id,
-      });
+    res.json({
+      id: (createdGame as any).id,
+      player_id: (createdGame as any).player_id,
+      player_1_location: (createdGame as any).player_1_location,
+      player_2_location: (createdGame as any).player_2_location,
+      total_dice_rolls: (createdGame as any).total_dice_rolls,
+      current_player: (createdGame as any).current_player,
+      save_date: (createdGame as any).save_date,
+    });
 
-      res.json({
-        id: (createdGame as any).id,
-        player_id: (createdGame as any).player_id,
-        player_1_location: (createdGame as any).player_1_location,
-        player_2_location: (createdGame as any).player_2_location,
-        total_dice_rolls: (createdGame as any).total_dice_rolls,
-        current_player: (createdGame as any).current_player,
-        save_date: (createdGame as any).save_date,
-      });
-
-      return;
-    }
-
-    res.status(400).send("unauthorized");
+    res.status(200).end();
   }
 
   public async saveGame(req: express.Request, res: express.Response) {
-    const token = req.get("Authorization") as string;
     const game = req.body;
+    const player = await (GameController.instance as GameController).#getPlayer(
+      req,
+      res
+    );
 
-    console.log(game);
-
-    try {
-      jwt.verify(token, config.jwt_secret);
-    } catch {
-      res.status(400).send("invalid token");
+    if (player === null) {
+      res.status(500).end();
       return;
     }
-
-    if (token.length !== 0) {
-      Game.update(
-        {
-          player_1_location: game.player_1_location,
-          player_2_location: game.player_2_location,
-          total_dice_rolls: game.total_dice_rolls,
-          current_player: game.current_player,
-          save_date: new Date().getTime(),
+    Game.update(
+      {
+        player_1_location: game.player_1_location,
+        player_2_location: game.player_2_location,
+        total_dice_rolls: game.total_dice_rolls,
+        current_player: game.current_player,
+        save_date: new Date().getTime(),
+      },
+      {
+        where: {
+          id: game.id,
         },
-        {
-          where: {
-            id: game.id,
-          },
-        }
-      );
+      }
+    );
 
-      res.status(200);
-      return;
-    }
-
-    res.status(400).send("unauthorized");
+    res.status(200).end();
   }
 
   public async loadGames(req: express.Request, res: express.Response) {
-    const token = req.get("Authorization") as string;
+    const player = await (GameController.instance as GameController).#getPlayer(
+      req,
+      res
+    );
 
-    try {
-      jwt.verify(token, config.jwt_secret);
-    } catch {
-      res.status(400).send("invalid token");
+    if (player === null) {
+      res.status(500).end();
       return;
     }
 
-    if (token.length !== 0) {
-      const player = (
-        await Player.findOne({
-          where: {
-            username: jwt.decode(token, { json: true })?.username,
-          },
-        })
-      )?.get();
+    const fetchedGames = await Game.findAll({
+      where: { player_id: player.id },
+    });
 
-      const fetchedGames = await Game.findAll({
-        where: { player_id: player.id },
-      });
-
-      res.json(fetchedGames);
-      return;
-    }
-
-    res.status(400).send("unauthorized");
+    res.json(fetchedGames);
   }
 
   public async loadSingleGame(req: express.Request, res: express.Response) {
     const { id } = req.params;
-    const token = req.get("Authorization") as string;
 
-    try {
-      jwt.verify(token, config.jwt_secret);
-    } catch {
-      res.status(400).send("invalid token");
+    const player = await (GameController.instance as GameController).#getPlayer(
+      req,
+      res
+    );
+
+    if (player === null) {
+      res.status(500).end();
       return;
     }
 
-    if (token.length !== 0) {
-      const player = (
-        await Player.findOne({
-          where: {
-            username: jwt.decode(token, { json: true })?.username,
-          },
-        })
-      )?.get();
+    const fetchedGame = await Game.findOne({
+      where: { player_id: player.id, id: id },
+    });
 
-      const fetchedGame = await Game.findOne({
-        where: { player_id: player.id, id: id },
-      });
-
-      res.json(fetchedGame);
-      return;
-    }
-
-    res.status(400).send("unauthorized");
+    res.json(fetchedGame);
+    return;
   }
 
   public async deleteGame(req: express.Request, res: express.Response) {
     const { id } = req.params;
+    const player = await (GameController.instance as GameController).#getPlayer(
+      req,
+      res
+    );
+
+    if (player === null) {
+      res.status(500).end();
+      return;
+    }
+
+    await Game.destroy({
+      where: { player_id: player.id, id: id },
+    }).catch(() => res.status(500));
+
+    res.status(200).end();
+  }
+
+  async #getPlayer(req: express.Request, res: express.Response): Promise<any> {
     const token = req.get("Authorization") as string;
 
     try {
@@ -179,23 +157,16 @@ class GameController {
     }
 
     if (token.length !== 0) {
-      const player = (
+      return (
         await Player.findOne({
           where: {
             username: jwt.decode(token, { json: true })?.username,
           },
         })
       )?.get();
-
-      await Game.destroy({
-        where: { player_id: player.id, id: id },
-      }).catch(() => res.status(500));
-
-      res.status(200).end();
-      return;
     }
 
-    res.status(400).send("unauthorized");
+    res.status(400).end();
   }
 }
 

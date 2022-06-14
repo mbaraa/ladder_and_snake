@@ -76,7 +76,7 @@ class PlayerController {
     try {
       jwt.verify(_token, config.jwt_secret);
     } catch {
-      res.status(400);
+      res.status(400).end();
       return;
     }
 
@@ -92,7 +92,7 @@ class PlayerController {
     }
 
     if (player === null || player === undefined) {
-      res.status(401).send("unauthorized");
+      res.status(401).end();
       return;
     }
 
@@ -133,10 +133,8 @@ class PlayerController {
       })
       .catch((err) => {
         console.error(err);
-        res.status(500).send("something went wrong...");
+        res.status(500).end();
       });
-
-    // res.end();
   }
 }
 
