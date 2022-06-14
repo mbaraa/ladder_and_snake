@@ -22,11 +22,15 @@
     "typescript": "^4.7.3"
   },
   "dependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
     "@types/jsonwebtoken": "^8.5.8",
+    "bcrypt": "^5.0.1",
+    "connection-manager": "^1.0.5",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "mariadb": "^3.0.0",
     "mysql2": "^2.3.3",
     "sequelize": "^6.20.1",
     "ts-node": "^10.8.1"
