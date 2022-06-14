@@ -2,14 +2,22 @@ import * as React from "react";
 import Game from "../../models/game";
 import GameRequests from "../../utils/game_requests";
 import Button from "../Button";
+import { useHistory } from "react-router-dom";
 
 const AvailableGames = (): React.ReactElement => {
+  const router = useHistory();
+
   const [games, setGames] = React.useState<Game[] | null>(null);
   React.useEffect(() => {
     (async () => {
       setGames(await GameRequests.loadGames());
     })();
   }, []);
+
+  const loadGame = (id: number) => {
+    router.push(`/game/${id}`);
+  };
+
   return (
     <div className="mt-[20px] h-[100%] mx-[10px]">
       <table className="border-2 border-black w-[100%] h-[100%]">
@@ -28,7 +36,9 @@ const AvailableGames = (): React.ReactElement => {
                     <div>
                       <Button
                         title="Load"
-                        onClick={() => {}}
+                        onClick={() => {
+                          loadGame(game.id);
+                        }}
                         className="w-[100px] p-0 text-[15px]"
                       />
                     </div>

@@ -18,6 +18,14 @@ class GameController {
       GameController.router.post("/save/", GameController.instance.saveGame);
       GameController.router.get("/new/", GameController.instance.newGame);
       GameController.router.get("/load/", GameController.instance.loadGames);
+      GameController.router.get(
+        "/single/:id",
+        GameController.instance.loadSingleGame
+      );
+      GameController.router.delete(
+        "/del/:id",
+        GameController.instance.deleteGame
+      );
     }
 
     return GameController.router;
@@ -52,6 +60,7 @@ class GameController {
         player_1_location: (createdGame as any).player_1_location,
         player_2_location: (createdGame as any).player_2_location,
         total_dice_rolls: (createdGame as any).total_dice_rolls,
+        current_player: (createdGame as any).current_player,
         save_date: (createdGame as any).save_date,
       });
 
@@ -80,6 +89,7 @@ class GameController {
           player_1_location: game.player_1_location,
           player_2_location: game.player_2_location,
           total_dice_rolls: game.total_dice_rolls,
+          current_player: game.current_player,
           save_date: new Date().getTime(),
         },
         {
@@ -106,7 +116,6 @@ class GameController {
       return;
     }
 
-    let player: any;
     if (token.length !== 0) {
       const player = (
         await Player.findOne({
@@ -121,6 +130,68 @@ class GameController {
       });
 
       res.json(fetchedGames);
+      return;
+    }
+
+    res.status(400).send("unauthorized");
+  }
+
+  public async loadSingleGame(req: express.Request, res: express.Response) {
+    const { id } = req.params;
+    const token = req.get("Authorization") as string;
+
+    try {
+      jwt.verify(token, config.jwt_secret);
+    } catch {
+      res.status(400).send("invalid token");
+      return;
+    }
+
+    if (token.length !== 0) {
+      const player = (
+        await Player.findOne({
+          where: {
+            username: jwt.decode(token, { json: true })?.username,
+          },
+        })
+      )?.get();
+
+      const fetchedGame = await Game.findOne({
+        where: { player_id: player.id, id: id },
+      });
+
+      res.json(fetchedGame);
+      return;
+    }
+
+    res.status(400).send("unauthorized");
+  }
+
+  public async deleteGame(req: express.Request, res: express.Response) {
+    const { id } = req.params;
+    const token = req.get("Authorization") as string;
+
+    try {
+      jwt.verify(token, config.jwt_secret);
+    } catch {
+      res.status(400).send("invalid token");
+      return;
+    }
+
+    if (token.length !== 0) {
+      const player = (
+        await Player.findOne({
+          where: {
+            username: jwt.decode(token, { json: true })?.username,
+          },
+        })
+      )?.get();
+
+      await Game.destroy({
+        where: { player_id: player.id, id: id },
+      }).catch(() => res.status(500));
+
+      res.status(200).end();
       return;
     }
 

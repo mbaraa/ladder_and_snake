@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Switch, Route } from "react-router-dom";
 import Player from "./models/player";
+import Game from "./pages/Game";
 import Games from "./pages/Games";
 import Login from "./pages/Login";
 import PlayerRequests from "./utils/player_requests";
@@ -30,6 +31,10 @@ const App = (): React.ReactElement => {
 
         <Route path="/login">
           <Login />
+        </Route>
+
+        <Route path="/game/:id">
+          <Game />
         </Route>
       </Switch>
     </>

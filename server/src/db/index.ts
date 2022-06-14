@@ -21,6 +21,5 @@ const db = new Sequelize({
 });
 
 db.sync();
-// db.authenticate();
 
 export default db;

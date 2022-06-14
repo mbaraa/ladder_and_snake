@@ -9,9 +9,9 @@ const NewGame = (): React.ReactElement => {
 
   const newGame = async () => {
     const game = await GameRequests.newGame();
-    console.log("game: ", game);
-    // await router.push()
+    router.push(`/game/${game?.id}`);
   };
+
   return (
     <>
       <h6 className="text-center w-[100%] mt-[10px]">

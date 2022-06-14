@@ -30,7 +30,7 @@ class GameRequests {
       }),
       body: JSON.stringify(game),
     })
-      .then((resp) => resp.status !== 200)
+      .then((resp) => resp.status === 200)
       .catch((err) => {
         console.error(err);
         return false;
@@ -51,6 +51,39 @@ class GameRequests {
       .catch((err) => {
         console.error(err);
         return null;
+      });
+  }
+
+  public static async loadGame(id: number): Promise<Game | null> {
+    return await fetch(`${config.backendAddress}/game/single/${id}`, {
+      method: "GET",
+      mode: "cors",
+      headers: new Headers({
+        Authorization: localStorage.getItem("token") as string,
+        accept: "*/*",
+      }),
+    })
+      .then((resp) => resp.json())
+      .then((resp) => resp as Game)
+      .catch((err) => {
+        console.error(err);
+        return null;
+      });
+  }
+
+  public static async deleteGame(id: number): Promise<boolean> {
+    return await fetch(`${config.backendAddress}/game/del/${id}`, {
+      method: "DELETE",
+      mode: "cors",
+      headers: new Headers({
+        Authorization: localStorage.getItem("token") as string,
+        accept: "*/*",
+      }),
+    })
+      .then((resp) => resp.status === 200)
+      .catch((err) => {
+        console.error(err);
+        return false;
       });
   }
 }

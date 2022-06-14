@@ -38,6 +38,12 @@ const Game = db.define(
       defaultValue: 0,
     },
 
+    current_player: {
+      type: seq.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
     save_date: {
       type: seq.DATE,
       allowNull: false,
