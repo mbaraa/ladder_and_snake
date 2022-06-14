@@ -139,6 +139,7 @@ const Board = ({ game, update }: Props): React.ReactElement => {
         }
       }
     }
+    update();
   };
 
   const rollDice = () => {
@@ -148,7 +149,7 @@ const Board = ({ game, update }: Props): React.ReactElement => {
     }
 
     const freshGame =
-      game.player_1_location === 1 && game.player_2_location === 2;
+      game.player_1_location === 1 && game.player_2_location === 1;
 
     cells[
       cells.findIndex(
@@ -171,14 +172,15 @@ const Board = ({ game, update }: Props): React.ReactElement => {
     }
 
     setCells(cells.flat());
+    update();
 
     game.total_dice_rolls++;
 
-    if (!freshGame) {
-      game.current_player = game.current_player === 1 ? 2 : 1;
-    }
     if (gameOver) {
       return;
+    }
+    if (!freshGame) {
+      game.current_player = game.current_player === 1 ? 2 : 1;
     }
     update();
   };
@@ -194,7 +196,7 @@ const Board = ({ game, update }: Props): React.ReactElement => {
             <h1 className="text-[50px] text-center w-[100%]">Great</h1>
             <h1 className="text-[50px] text-center w-[100%]">
               <label className="text-[#d9cc2a]">
-                Player {game.current_player}
+                Player {game.current_player === 1 ? 2 : 1}
               </label>{" "}
               Won
             </h1>

@@ -12,7 +12,18 @@ const SignupFragment = (): React.ReactElement => {
   });
 
   const signup = async () => {
-    await PlayerRequests.signup(player);
+    if (
+      player.full_name === "" ||
+      player.username === "" ||
+      player.password === ""
+    ) {
+      window.alert("fill all the fields to complete your registration!");
+      return;
+    }
+    const _player = await PlayerRequests.signup(player);
+    if (_player === null) {
+      window.alert("username already exists!");
+    }
     window.location.reload();
   };
 

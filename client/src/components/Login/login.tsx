@@ -12,7 +12,10 @@ const LoginFragment = (): React.ReactElement => {
   });
 
   const login = async () => {
-    await PlayerRequests.login(player);
+    const _player = await PlayerRequests.login(player);
+    if (_player === null) {
+      window.alert("invalid credintials");
+    }
     window.location.reload();
   };
 
